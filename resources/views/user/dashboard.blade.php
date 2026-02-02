@@ -12,27 +12,27 @@
             <div class="card-body">
                 <div class="row">
                     <div class="card bg-primary text-white mb-3">
-    <div class="card-body">
-        <h5 class="card-title">
-            <i class="fas fa-landmark"></i> Informasi Pengadilan
-        </h5>
-        <hr>
-        @isset($pengadilan)
-            <p class="mb-1"><strong>Nama:</strong> {{ $pengadilan->nama ?? 'Tidak tersedia' }}</p>
-            <p class="mb-1"><strong>Kode:</strong> {{ $pengadilan->kode ?? 'Tidak tersedia' }}</p>
-            <p class="mb-1"><strong>Wilayah:</strong> {{ $pengadilan->wilayah ?? 'Tidak tersedia' }}</p>
-            @if(!empty($pengadilan->kelas))
-                <p class="mb-0"><strong>Kelas:</strong> {{ $pengadilan->kelas }}</p>
-            @endif
-        @else
-            <div class="alert alert-warning mb-0">
-                <i class="fas fa-exclamation-triangle"></i>
-                Data pengadilan tidak ditemukan
-            </div>
-        @endisset
-    </div>
-</div>
-                    
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-landmark"></i> Informasi Pengadilan
+                            </h5>
+                            <hr>
+                            @isset($pengadilan)
+                            <p class="mb-1"><strong>Nama:</strong> {{ $pengadilan->nama ?? 'Tidak tersedia' }}</p>
+                            <p class="mb-1"><strong>Kode:</strong> {{ $pengadilan->kode ?? 'Tidak tersedia' }}</p>
+                            <p class="mb-1"><strong>Wilayah:</strong> {{ $pengadilan->wilayah ?? 'Tidak tersedia' }}</p>
+                            @if(!empty($pengadilan->kelas))
+                            <p class="mb-0"><strong>Kelas:</strong> {{ $pengadilan->kelas }}</p>
+                            @endif
+                            @else
+                            <div class="alert alert-warning mb-0">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Data pengadilan tidak ditemukan
+                            </div>
+                            @endisset
+                        </div>
+                    </div>
+
                     <div class="col-md-6">
                         <div class="card bg-success text-white mb-3">
                             <div class="card-body">
@@ -49,84 +49,84 @@
                     </div>
                 </div>
                 {{-- Tambahkan setelah Informasi Akun --}}
-<div class="row mt-4">
-    <div class="col-md-4 mb-3">
-        <div class="card text-white bg-info">
-            <div class="card-body text-center">
-                <h1><i class="fas fa-file-upload"></i></h1>
-                <h5>Total Upload</h5>
-                <h3>{{ $totalUploads ?? 0 }}</h3>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4 mb-3">
-        <div class="card text-white bg-primary">
-            <div class="card-body text-center">
-                <h1><i class="fas fa-gavel"></i></h1>
-                <h5>Putusan Kasasi</h5>
-                <h3>{{ $kasasiCount ?? 0 }}</h3>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4 mb-3">
-        <div class="card text-white bg-warning">
-            <div class="card-body text-center">
-                <h1><i class="fas fa-balance-scale"></i></h1>
-                <h5>Putusan PK</h5>
-                <h3>{{ $pkCount ?? 0 }}</h3>
-            </div>
-        </div>
-    </div>
-</div>
+                <div class="row mt-4">
+                    <div class="col-md-4 mb-3">
+                        <div class="card text-white bg-info">
+                            <div class="card-body text-center">
+                                <h1><i class="fas fa-file-upload"></i></h1>
+                                <h5>Total Upload</h5>
+                                <h3>{{ $totalUploads ?? 0 }}</h3>
+                            </div>
+                        </div>
+                    </div>
 
-{{-- Recent Uploads --}}
-@if(isset($recentUploads) && $recentUploads->count() > 0)
-<div class="row mt-4">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <h6 class="mb-0"><i class="fas fa-history"></i> Upload Terbaru</h6>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th>Tanggal</th>
-                                <th>Jenis</th>
-                                <th>Nomor Perkara</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($recentUploads as $upload)
-                            <tr>
-                                <td>{{ $upload->created_at->format('d/m/Y') }}</td>
-                                <td>
-                                    <span class="badge bg-{{ $upload->jenis_putusan == 'kasasi' ? 'primary' : 'warning' }}">
-                                        {{ strtoupper($upload->jenis_putusan) }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <small>{{ $upload->nomor_perkara_pa }}</small>
-                                </td>
-                                <td>
-                                    <span class="badge bg-{{ $upload->status == 'submitted' ? 'info' : 'success' }}">
-                                        {{ ucfirst($upload->status) }}
-                                    </span>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    <div class="col-md-4 mb-3">
+                        <div class="card text-white bg-primary">
+                            <div class="card-body text-center">
+                                <h1><i class="fas fa-gavel"></i></h1>
+                                <h5>Putusan Kasasi</h5>
+                                <h3>{{ $kasasiCount ?? 0 }}</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <div class="card text-white bg-warning">
+                            <div class="card-body text-center">
+                                <h1><i class="fas fa-balance-scale"></i></h1>
+                                <h5>Putusan PK</h5>
+                                <h3>{{ $pkCount ?? 0 }}</h3>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-@endif
+
+                {{-- Recent Uploads --}}
+                @if(isset($recentUploads) && $recentUploads->count() > 0)
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="fas fa-history"></i> Upload Terbaru</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Tanggal</th>
+                                                <th>Jenis</th>
+                                                <th>Nomor Perkara</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($recentUploads as $upload)
+                                            <tr>
+                                                <td>{{ $upload->created_at->format('d/m/Y') }}</td>
+                                                <td>
+                                                    <span class="badge bg-{{ $upload->jenis_putusan == 'kasasi' ? 'primary' : 'warning' }}">
+                                                        {{ strtoupper($upload->jenis_putusan) }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <small>{{ $upload->nomor_perkara_pa }}</small>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-{{ $upload->status == 'submitted' ? 'info' : 'success' }}">
+                                                        {{ ucfirst($upload->status) }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
                 <div class="row mt-4">
                     <div class="col-md-12">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-start">

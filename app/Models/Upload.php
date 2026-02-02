@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Upload extends Model
 {
@@ -23,24 +22,32 @@ class Upload extends Model
         'original_filename',
         'file_size',
         'status',
-        'catatan',
-        'verified_at',
-        'verified_by',
     ];
 
     protected $casts = [
         'tanggal_putusan' => 'date',
-        'verified_at' => 'datetime',
+        'file_size' => 'integer'
     ];
 
-    // ✅ Relationship dengan pengadilan (table singular)
-    public function pengadilan(): BelongsTo
+    // Accessor untuk URL file
+    public function getFileUrlAttribute()
     {
-        return $this->belongsTo(Pengadilan::class, 'pengadilan_id');
+        return $this->file_path ? asset('storage/' . $this->file_path) : null;
     }
 
-    public function user(): BelongsTo
+    // Accessor untuk path lengkap
+    public function getFullPathAttribute()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->file_path ? storage_path('app/public/' . $this->file_path) : null;
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function pengadilan()
+    {
+        return $this->belongsTo(Pengadilan::class);
     }
 }

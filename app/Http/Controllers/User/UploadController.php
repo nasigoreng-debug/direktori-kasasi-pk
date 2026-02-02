@@ -7,24 +7,42 @@ use App\Models\Upload;
 use App\Models\Pengadilan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class UploadController extends Controller
 {
     /**
-     * Show the form for creating a new upload
+     * Menampilkan form untuk membuat upload baru
+     * 
+     * Method ini menampilkan form upload dokumen putusan
+     * dengan daftar pengadilan untuk dipilih
+     * 
+     * @return \Illuminate\View\View
      */
     public function create()
     {
+        // Ambil semua data pengadilan untuk dropdown
         $pengadilans = Pengadilan::orderBy('kode')->get();
         return view('user.upload.create', compact('pengadilans'));
     }
 
     /**
-     * Store a newly created upload
+     * Menyimpan upload baru ke database dan storage
+     * 
+     * Method ini menangani upload file putusan dengan:
+     * 1. Validasi input dan file
+     * 2. Upload file ke storage dengan multiple fallback methods
+     * 3. Simpan metadata ke database
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
     {
-        $request->validate([
+        // ============================================
+        // VALIDASI INPUT FORM
+        // ============================================
+        $validated = $request->validate([
             'pengadilan_id' => 'required|exists:pengadilan,id',
             'jenis_putusan' => 'required|in:kasasi,pk',
             'nomor_perkara_pa' => 'required|string|max:100',
@@ -32,40 +50,121 @@ class UploadController extends Controller
             'nomor_perkara_kasasi' => 'nullable|string|max:100',
             'nomor_perkara_pk' => 'nullable|string|max:100',
             'tanggal_putusan' => 'required|date',
-            'file_putusan' => 'required|file|mimes:pdf|max:10240', // max 10MB
+            'file_putusan' => 'required|file|mimes:pdf|max:10240', // Max 10MB
         ]);
 
-        // Upload file
+        // ============================================
+        // PROSES UPLOAD FILE
+        // ============================================
         if ($request->hasFile('file_putusan')) {
             $file = $request->file('file_putusan');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $path = $file->storeAs('uploads', $filename, 'public');
+
+            // Validasi file
+            if (!$file->isValid()) {
+                return back()->withErrors(['file_putusan' => 'File tidak valid.'])->withInput();
+            }
+
+            // Data file
+            $originalName = $file->getClientOriginalName();
             $fileSize = $file->getSize();
-            $originalFilename = $file->getClientOriginalName();
+
+            // Generate nama file yang aman
+            $filename = 'putusan_' . time() . '_' . auth()->id() . '_' .
+                preg_replace('/[^A-Za-z0-9\.\_\-]/', '_', $originalName);
+
+            // ============================================
+            // UPLOAD FILE DENGAN FALLBACK METHODS
+            // ============================================
+            $uploadDir = storage_path('app/public/uploads');
+
+            // Pastikan folder upload ada
+            if (!file_exists($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+                Log::info('Created upload directory: ' . $uploadDir);
+            }
+
+            // Cek permission folder
+            if (!is_writable($uploadDir)) {
+                Log::warning('Directory not writable: ' . $uploadDir);
+                return back()->withErrors(['file_putusan' => 'Folder upload tidak memiliki izin tulis.'])->withInput();
+            }
+
+            // Path lengkap tujuan
+            $destination = $uploadDir . DIRECTORY_SEPARATOR . $filename;
+
+            // Coba upload dengan berbagai metode
+            try {
+                // Method 1: move()
+                $moved = $file->move($uploadDir, $filename);
+
+                if (!$moved) {
+                    // Method 2: rename()
+                    Log::warning('move() failed, trying rename()...');
+                    $tempPath = $file->getRealPath();
+                    if (rename($tempPath, $destination)) {
+                        $moved = true;
+                    } else {
+                        // Method 3: copy()
+                        Log::warning('rename() failed, trying copy()...');
+                        if (copy($tempPath, $destination)) {
+                            $moved = true;
+                            unlink($tempPath); // Hapus file temp
+                        }
+                    }
+                }
+
+                // Cek jika semua method gagal
+                if (!$moved) {
+                    throw new \Exception('Gagal memindahkan file ke server');
+                }
+
+                // Verifikasi file berhasil disimpan
+                if (!file_exists($destination)) {
+                    throw new \Exception('File tidak ditemukan setelah dipindahkan');
+                }
+
+                // Path untuk database
+                $filePath = 'uploads/' . $filename;
+
+                Log::info('File uploaded successfully:', [
+                    'path' => $filePath,
+                    'size' => filesize($destination)
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Upload error: ' . $e->getMessage());
+                return back()->withErrors(['file_putusan' => 'Gagal menyimpan file: ' . $e->getMessage()])->withInput();
+            }
+
+            // ============================================
+            // SIMPAN KE DATABASE
+            // ============================================
+            $upload = Upload::create([
+                'user_id' => auth()->id(),
+                'pengadilan_id' => $request->pengadilan_id,
+                'jenis_putusan' => $request->jenis_putusan,
+                'nomor_perkara_pa' => $request->nomor_perkara_pa,
+                'nomor_perkara_banding' => $request->nomor_perkara_banding,
+                'nomor_perkara_kasasi' => $request->nomor_perkara_kasasi,
+                'nomor_perkara_pk' => $request->nomor_perkara_pk,
+                'tanggal_putusan' => $request->tanggal_putusan,
+                'file_path' => $filePath,
+                'original_filename' => $originalName,
+                'file_size' => $fileSize,
+                'status' => 'submitted',
+            ]);
+
+            return redirect()->route('user.upload.history')
+                ->with('success', 'Putusan berhasil diupload!');
         }
 
-        // Simpan data
-        $upload = Upload::create([
-            'user_id' => auth()->id(),
-            'pengadilan_id' => $request->pengadilan_id,
-            'jenis_putusan' => $request->jenis_putusan,
-            'nomor_perkara_pa' => $request->nomor_perkara_pa,
-            'nomor_perkara_banding' => $request->nomor_perkara_banding,
-            'nomor_perkara_kasasi' => $request->nomor_perkara_kasasi,
-            'nomor_perkara_pk' => $request->nomor_perkara_pk,
-            'tanggal_putusan' => $request->tanggal_putusan,
-            'file_path' => $path ?? null,
-            'original_filename' => $originalFilename ?? null,
-            'file_size' => $fileSize ?? 0,
-            'status' => 'submitted',
-        ]);
-
-        return redirect()->route('user.upload.history')
-            ->with('success', 'Putusan berhasil diupload. Menunggu verifikasi admin.');
+        return back()->withErrors(['file_putusan' => 'Tidak ada file yang diunggah.'])->withInput();
     }
 
     /**
-     * Display upload history
+     * Menampilkan riwayat upload user
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\View\View
      */
     public function history(Request $request)
     {
@@ -73,57 +172,98 @@ class UploadController extends Controller
             ->with('pengadilan')
             ->orderBy('created_at', 'desc');
 
-        // Filter
+        // Filter berdasarkan jenis putusan
         if ($request->filled('jenis_putusan')) {
             $query->where('jenis_putusan', $request->jenis_putusan);
         }
 
+        // Filter berdasarkan status
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
         $uploads = $query->paginate(15);
-
         return view('user.upload.history', compact('uploads'));
     }
 
     /**
-     * Download file
+     * Mengunduh file putusan
+     * 
+     * @param  int  $id
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function download($id)
     {
+        // Validasi kepemilikan
         $upload = Upload::where('user_id', auth()->id())->findOrFail($id);
-        $path = storage_path('app/public/' . $upload->file_path);
 
-        if (!file_exists($path)) {
-            return redirect()->back()->with('error', 'File tidak ditemukan.');
+        // Cek file di storage
+        if (!Storage::disk('public')->exists($upload->file_path)) {
+            Log::error('File not found: ' . $upload->file_path);
+
+            // Coba cari di beberapa lokasi yang mungkin
+            $possiblePaths = [
+                storage_path('app/public/' . $upload->file_path),
+                public_path('storage/' . $upload->file_path),
+                storage_path('app/public/uploads/' . basename($upload->file_path)),
+            ];
+
+            // Cari file di lokasi alternatif
+            $foundPath = null;
+            foreach ($possiblePaths as $path) {
+                if (file_exists($path)) {
+                    $foundPath = $path;
+                    break;
+                }
+            }
+
+            if (!$foundPath) {
+                return back()->with('error', 'File tidak ditemukan di server.');
+            }
+
+            return response()->download($foundPath, $upload->original_filename);
         }
 
-        return response()->download($path, $upload->original_filename);
+        // Download file
+        $filePath = storage_path('app/public/' . $upload->file_path);
+        return response()->download($filePath, $upload->original_filename);
     }
 
     /**
-     * Preview file
+     * Melihat preview file putusan
+     * 
+     * @param  int  $id
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function preview($id)
     {
         $upload = Upload::where('user_id', auth()->id())->findOrFail($id);
 
-        if (pathinfo($upload->file_path, PATHINFO_EXTENSION) === 'pdf') {
-            return response()->file(storage_path('app/public/' . $upload->file_path));
+        if (!Storage::disk('public')->exists($upload->file_path)) {
+            return back()->with('error', 'File tidak ditemukan.');
+        }
+
+        $filePath = storage_path('app/public/' . $upload->file_path);
+
+        // Jika file PDF, tampilkan inline
+        if (strtolower(pathinfo($upload->file_path, PATHINFO_EXTENSION)) === 'pdf') {
+            return response()->file($filePath);
         }
 
         return view('user.upload.preview', compact('upload'));
     }
 
     /**
-     * Show the form for editing an upload
+     * Menampilkan form untuk mengedit upload
+     * 
+     * @param  int  $id
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function edit($id)
     {
         $upload = Upload::where('user_id', auth()->id())->findOrFail($id);
 
-        // Cek jika sudah diverifikasi/tidak bisa edit
+        // Cek status - jika sudah verified tidak bisa diedit
         if ($upload->status === 'verified') {
             return redirect()->route('user.upload.history')
                 ->with('error', 'Putusan yang sudah diverifikasi tidak dapat diedit.');
@@ -134,18 +274,24 @@ class UploadController extends Controller
     }
 
     /**
-     * Update the specified upload
+     * Memperbarui data upload
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, $id)
     {
+        // Validasi kepemilikan
         $upload = Upload::where('user_id', auth()->id())->findOrFail($id);
 
-        // Cek jika sudah diverifikasi/tidak bisa edit
+        // Cek status
         if ($upload->status === 'verified') {
             return redirect()->route('user.upload.history')
                 ->with('error', 'Putusan yang sudah diverifikasi tidak dapat diedit.');
         }
 
+        // Validasi input
         $request->validate([
             'pengadilan_id' => 'required|exists:pengadilan,id',
             'jenis_putusan' => 'required|in:kasasi,pk',
@@ -157,6 +303,10 @@ class UploadController extends Controller
             'file_putusan' => 'nullable|file|mimes:pdf|max:10240',
         ]);
 
+        Log::info('=== UPDATE PROCESS START ===');
+        Log::info('Upload ID: ' . $id);
+
+        // Data untuk update
         $updateData = [
             'pengadilan_id' => $request->pengadilan_id,
             'jenis_putusan' => $request->jenis_putusan,
@@ -165,55 +315,157 @@ class UploadController extends Controller
             'nomor_perkara_kasasi' => $request->nomor_perkara_kasasi,
             'nomor_perkara_pk' => $request->nomor_perkara_pk,
             'tanggal_putusan' => $request->tanggal_putusan,
-            'status' => 'submitted', // Reset status ke submitted setelah edit
+            'status' => 'submitted', // Reset status setelah edit
         ];
 
-        // Update file jika ada file baru
+        // ============================================
+        // PROSES FILE BARU JIKA ADA
+        // ============================================
         if ($request->hasFile('file_putusan')) {
-            // Hapus file lama
-            if ($upload->file_path && Storage::disk('public')->exists($upload->file_path)) {
-                Storage::disk('public')->delete($upload->file_path);
+            $file = $request->file('file_putusan');
+
+            if (!$file->isValid()) {
+                Log::error('New file invalid');
+                return back()->withErrors(['file_putusan' => 'File tidak valid.'])->withInput();
             }
 
-            $file = $request->file('file_putusan');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $path = $file->storeAs('uploads', $filename, 'public');
+            $originalName = $file->getClientOriginalName();
+            $fileSize = $file->getSize();
+            $filename = 'putusan_edit_' . time() . '_' . auth()->id() . '_' .
+                preg_replace('/[^A-Za-z0-9\.\_\-]/', '_', $originalName);
 
-            $updateData['file_path'] = $path;
-            $updateData['original_filename'] = $file->getClientOriginalName();
-            $updateData['file_size'] = $file->getSize();
+            Log::info('New file info:', [
+                'original' => $originalName,
+                'new_name' => $filename,
+                'size' => $fileSize
+            ]);
+
+            // ============================================
+            // HAPUS FILE LAMA
+            // ============================================
+            if ($upload->file_path) {
+                try {
+                    $oldFilePath = storage_path('app/public/' . $upload->file_path);
+                    Log::info('Attempting to delete old file: ' . $oldFilePath);
+
+                    if (file_exists($oldFilePath)) {
+                        if (unlink($oldFilePath)) {
+                            Log::info('Old file deleted successfully');
+                        } else {
+                            Log::warning('Failed to delete old file');
+                        }
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Error deleting old file: ' . $e->getMessage());
+                }
+            }
+
+            // ============================================
+            // UPLOAD FILE BARU
+            // ============================================
+            $uploadDir = storage_path('app/public/uploads');
+
+            if (!file_exists($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+                Log::info('Created upload directory');
+            }
+
+            if (!is_writable($uploadDir)) {
+                Log::error('Directory not writable');
+                return back()->withErrors(['file_putusan' => 'Folder upload tidak memiliki izin tulis.'])->withInput();
+            }
+
+            $destination = $uploadDir . DIRECTORY_SEPARATOR . $filename;
+
+            try {
+                // Upload dengan fallback methods
+                $moved = $file->move($uploadDir, $filename);
+
+                if (!$moved) {
+                    // Fallback methods
+                    $tempPath = $file->getRealPath();
+                    if (!rename($tempPath, $destination)) {
+                        if (!copy($tempPath, $destination)) {
+                            throw new \Exception('Gagal memindahkan file baru');
+                        }
+                        unlink($tempPath);
+                    }
+                }
+
+                // Verifikasi
+                if (!file_exists($destination)) {
+                    throw new \Exception('File baru tidak ditemukan');
+                }
+
+                $newFilePath = 'uploads/' . $filename;
+
+                Log::info('New file uploaded successfully:', [
+                    'path' => $newFilePath
+                ]);
+
+                // Tambahkan data file ke updateData
+                $updateData['file_path'] = $newFilePath;
+                $updateData['original_filename'] = $originalName;
+                $updateData['file_size'] = $fileSize;
+            } catch (\Exception $e) {
+                Log::error('New file upload error: ' . $e->getMessage());
+                return back()->withErrors(['file_putusan' => 'Gagal menyimpan file baru.'])->withInput();
+            }
         }
 
-        $upload->update($updateData);
+        // ============================================
+        // UPDATE DATABASE
+        // ============================================
+        try {
+            Log::info('Updating database');
+            $upload->update($updateData);
+            Log::info('Database update SUCCESS');
+        } catch (\Exception $e) {
+            Log::error('Database update error: ' . $e->getMessage());
+
+            // Rollback: Hapus file baru jika gagal update database
+            if (isset($newFilePath) && isset($destination) && file_exists($destination)) {
+                unlink($destination);
+                Log::info('Rollback: deleted new file after database error');
+            }
+
+            return back()
+                ->withErrors(['error' => 'Gagal memperbarui data.'])
+                ->withInput();
+        }
+
+        Log::info('=== UPDATE PROCESS END ===');
 
         return redirect()->route('user.upload.history')
             ->with('success', 'Putusan berhasil diperbarui.');
     }
 
     /**
-     * Remove the specified upload (SOFT DELETE ke trash)
+     * Menghapus upload (soft delete)
+     * 
+     * @param  int  $id
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy($id)
     {
         $upload = Upload::where('user_id', auth()->id())->findOrFail($id);
 
-        // Cek jika sudah diverifikasi/tidak bisa hapus
         if ($upload->status === 'verified') {
             return redirect()->route('user.upload.history')
                 ->with('error', 'Putusan yang sudah diverifikasi tidak dapat dihapus.');
         }
 
-        // Jangan hapus file fisik di sini (hanya soft delete)
-        // File akan dihapus permanen saat forceDelete()
-
-        $upload->delete(); // Ini soft delete (menambahkan deleted_at)
+        $upload->delete();
 
         return redirect()->route('user.upload.history')
             ->with('success', 'Putusan berhasil dipindahkan ke trash.');
     }
 
     /**
-     * Display trash (soft deleted uploads)
+     * Menampilkan daftar upload yang dihapus (trash)
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\View\View
      */
     public function trashIndex(Request $request)
     {
@@ -228,11 +480,14 @@ class UploadController extends Controller
 
         $uploads = $query->paginate(15);
 
-        return view('user.trash.index', compact('uploads'));
+        return view('user.upload.trash.index', compact('uploads'));
     }
 
     /**
-     * Restore soft deleted upload
+     * Memulihkan upload dari trash
+     * 
+     * @param  int  $id
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function restore($id)
     {
@@ -242,12 +497,15 @@ class UploadController extends Controller
 
         $upload->restore();
 
-        return redirect()->route('user.upload.trash.index')
+        return redirect()->route('user.upload.trash')
             ->with('success', 'Putusan berhasil dipulihkan.');
     }
 
     /**
-     * Permanently delete upload
+     * Menghapus permanen upload dari trash
+     * 
+     * @param  int  $id
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function forceDelete($id)
     {
@@ -260,6 +518,7 @@ class UploadController extends Controller
             Storage::disk('public')->delete($upload->file_path);
         }
 
+        // Hapus dari database
         $upload->forceDelete();
 
         return redirect()->route('user.upload.trash.index')
@@ -267,7 +526,9 @@ class UploadController extends Controller
     }
 
     /**
-     * Empty trash (delete all)
+     * Mengosongkan semua isi trash
+     * 
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function emptyTrash()
     {
@@ -282,11 +543,13 @@ class UploadController extends Controller
             if ($upload->file_path && Storage::disk('public')->exists($upload->file_path)) {
                 Storage::disk('public')->delete($upload->file_path);
             }
+
+            // Hapus dari database
             $upload->forceDelete();
             $deletedCount++;
         }
 
-        return redirect()->route('user.upload.trash.index')
+        return redirect()->route('user.upload.trash')
             ->with('success', $deletedCount . ' putusan di trash berhasil dihapus permanen.');
     }
 }

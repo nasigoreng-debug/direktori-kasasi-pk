@@ -3,7 +3,7 @@
 @section('title', 'Manajemen User')
 
 @section('breadcrumb')
-    <li class="breadcrumb-item active">Manajemen User</li>
+<li class="breadcrumb-item active">Manajemen User</li>
 @endsection
 
 @section('content')
@@ -21,14 +21,14 @@
                         </button>
                     </div>
                 </div>
-                
+
                 <div class="card-body">
                     <!-- Filter Form -->
                     <form method="GET" class="mb-4">
                         <div class="row">
                             <div class="col-md-3 mb-2">
-                                <input type="text" name="search" class="form-control" 
-                                       value="{{ request('search') }}" placeholder="Cari nama/email...">
+                                <input type="text" name="search" class="form-control"
+                                    value="{{ request('search') }}" placeholder="Cari nama/email...">
                             </div>
                             <div class="col-md-2 mb-2">
                                 <select name="role" class="form-select">
@@ -41,8 +41,8 @@
                                 <select name="pengadilan_id" class="form-select">
                                     <option value="">Semua Pengadilan</option>
                                     @foreach($pengadilan as $peng)
-                                    <option value="{{ $peng->id }}" 
-                                            {{ request('pengadilan_id') == $peng->id ? 'selected' : '' }}>
+                                    <option value="{{ $peng->id }}"
+                                        {{ request('pengadilan_id') == $peng->id ? 'selected' : '' }}>
                                         {{ $peng->kode }} - {{ $peng->nama }}
                                     </option>
                                     @endforeach
@@ -60,17 +60,17 @@
                     </form>
 
                     @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show">
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
+                    <div class="alert alert-success alert-dismissible fade show">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
                     @endif
 
                     @if(session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show">
-                            {{ session('error') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
                     @endif
 
                     <!-- User Table -->
@@ -103,12 +103,12 @@
                                     </td>
                                     <td>
                                         @if($user->pengadilan)
-                                            <small>
-                                                {{ $user->pengadilan->nama }}<br>
-                                                <small class="text-muted">{{ $user->pengadilan->kode }}</small>
-                                            </small>
+                                        <small>
+                                            {{ $user->pengadilan->nama }}<br>
+                                            <small class="text-muted">{{ $user->pengadilan->kode }}</small>
+                                        </small>
                                         @else
-                                            <span class="text-muted">-</span>
+                                        <span class="text-muted">-</span>
                                         @endif
                                     </td>
                                     <td>
@@ -122,23 +122,23 @@
                                     </td>
                                     <td>
                                         <div class="btn-group btn-group-sm">
-                                            <button type="button" class="btn btn-info" 
-                                                    data-bs-toggle="modal" data-bs-target="#showUserModal{{ $user->id }}"
-                                                    title="Detail">
+                                            <button type="button" class="btn btn-info"
+                                                data-bs-toggle="modal" data-bs-target="#showUserModal{{ $user->id }}"
+                                                title="Detail">
                                                 <i class="fas fa-eye"></i>
                                             </button>
-                                            <button type="button" class="btn btn-warning" 
-                                                    data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}"
-                                                    title="Edit">
+                                            <button type="button" class="btn btn-warning"
+                                                data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}"
+                                                title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <button type="button" class="btn btn-secondary" 
-                                                    onclick="resetPassword({{ $user->id }})" title="Reset Password">
+                                            <button type="button" class="btn btn-secondary"
+                                                onclick="resetPassword({{ $user->id }})" title="Reset Password">
                                                 <i class="fas fa-key"></i>
                                             </button>
-                                            <button type="button" class="btn btn-danger" 
-                                                    data-bs-toggle="modal" data-bs-target="#deleteUserModal{{ $user->id }}"
-                                                    title="Hapus">
+                                            <button type="button" class="btn btn-danger"
+                                                data-bs-toggle="modal" data-bs-target="#deleteUserModal{{ $user->id }}"
+                                                title="Hapus">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </div>
@@ -160,12 +160,12 @@
                                                     <div class="mb-3">
                                                         <label class="form-label">Nama</label>
                                                         <input type="text" name="name" class="form-control"
-                                                               value="{{ $user->name }}" required>
+                                                            value="{{ $user->name }}" required>
                                                     </div>
                                                     <div class="mb-3">
                                                         <label class="form-label">Email</label>
                                                         <input type="email" name="email" class="form-control"
-                                                               value="{{ $user->email }}" required>
+                                                            value="{{ $user->email }}" required>
                                                     </div>
                                                     <div class="mb-3">
                                                         <label class="form-label">Role</label>
@@ -180,7 +180,7 @@
                                                             <option value="">Pilih Pengadilan</option>
                                                             @foreach($pengadilan as $peng)
                                                             <option value="{{ $peng->id }}"
-                                                                    {{ $user->pengadilan_id == $peng->id ? 'selected' : '' }}>
+                                                                {{ $user->pengadilan_id == $peng->id ? 'selected' : '' }}>
                                                                 {{ $peng->nama }} ({{ $peng->kode }})
                                                             </option>
                                                             @endforeach
@@ -195,7 +195,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Modal Delete User -->
                                 <div class="modal fade" id="deleteUserModal{{ $user->id }}" tabindex="-1">
                                     <div class="modal-dialog">
@@ -209,7 +209,7 @@
                                                 @if($user->uploads_count > 0)
                                                 <div class="alert alert-warning">
                                                     <i class="fas fa-exclamation-triangle"></i>
-                                                    User ini memiliki {{ $user->uploads_count }} upload. 
+                                                    User ini memiliki {{ $user->uploads_count }} upload.
                                                     User dengan data upload tidak dapat dihapus!
                                                 </div>
                                                 @endif
@@ -310,23 +310,23 @@
 </div>
 
 <script>
-function resetPassword(userId) {
-    if (confirm('Reset password user ini ke "password123"? User akan diberitahu untuk mengganti password setelah login.')) {
-        fetch(`/admin/users/${userId}/reset-password`, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Password berhasil direset! Password baru: password123');
-                location.reload();
-            }
-        });
+    function resetPassword(userId) {
+        if (confirm('Reset password user ini ke "password123"? User akan diberitahu untuk mengganti password setelah login.')) {
+            fetch(`/admin/users/${userId}/reset-password`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Password berhasil direset! Password baru: password123');
+                        location.reload();
+                    }
+                });
+        }
     }
-}
 </script>
 @endsection

@@ -20,17 +20,17 @@
                 </div>
                 <div class="card-body">
                     @if(session('success'))
-                        <div class="alert alert-success">
-                            {{ session('success') }}
-                        </div>
+                    <div class="alert alert-success">
+                        {{ session('success') }}
+                    </div>
                     @endif
-                    
+
                     @if(session('error'))
-                        <div class="alert alert-danger">
-                            {{ session('error') }}
-                        </div>
+                    <div class="alert alert-danger">
+                        {{ session('error') }}
+                    </div>
                     @endif
-                    
+
                     <!-- Filter by Wilayah -->
                     <div class="mb-3">
                         <form method="GET" class="row g-2">
@@ -45,8 +45,8 @@
                                 </select>
                             </div>
                             <div class="col-md-4">
-                                <input type="text" name="search" class="form-control" 
-                                       placeholder="Cari nama/kode..." value="{{ request('search') }}">
+                                <input type="text" name="search" class="form-control"
+                                    placeholder="Cari nama/kode..." value="{{ request('search') }}">
                             </div>
                             <div class="col-md-2">
                                 <button type="submit" class="btn btn-primary">Cari</button>
@@ -54,7 +54,7 @@
                             </div>
                         </form>
                     </div>
-                    
+
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
@@ -88,32 +88,32 @@
                                     </td>
                                     <td>
                                         @if($pengadilan->kelas)
-                                            <span class="badge bg-warning">{{ $pengadilan->kelas }}</span>
+                                        <span class="badge bg-warning">{{ $pengadilan->kelas }}</span>
                                         @else
-                                            <span class="text-muted">-</span>
+                                        <span class="text-muted">-</span>
                                         @endif
                                     </td>
                                     <td>{{ $pengadilan->users_count ?? $pengadilan->users()->count() }}</td>
                                     <td>{{ $pengadilan->uploads_count ?? $pengadilan->uploads()->count() }}</td>
                                     <td>
                                         <div class="btn-group btn-group-sm">
-                                            <a href="{{ route('admin.pengadilan.show', $pengadilan->id) }}" 
-                                               class="btn btn-info" title="Detail">
+                                            <a href="{{ route('admin.pengadilan.show', $pengadilan->id) }}"
+                                                class="btn btn-info" title="Detail">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="{{ route('admin.pengadilan.edit', $pengadilan->id) }}" 
-                                               class="btn btn-warning" title="Edit">
+                                            <a href="{{ route('admin.pengadilan.edit', $pengadilan->id) }}"
+                                                class="btn btn-warning" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <button type="button" class="btn btn-danger" 
-                                                    data-bs-toggle="modal" data-bs-target="#deleteModal{{ $pengadilan->id }}"
-                                                    title="Hapus">
+                                            <button type="button" class="btn btn-danger"
+                                                data-bs-toggle="modal" data-bs-target="#deleteModal{{ $pengadilan->id }}"
+                                                title="Hapus">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </div>
                                     </td>
                                 </tr>
-                                
+
                                 <!-- Modal Delete -->
                                 <div class="modal fade" id="deleteModal{{ $pengadilan->id }}" tabindex="-1">
                                     <div class="modal-dialog">
@@ -151,12 +151,12 @@
                             </tbody>
                         </table>
                     </div>
-                    
+
                     <!-- Pagination -->
                     <div class="mt-3">
                         {{ $pengadilans->links() }}
                     </div>
-                    
+
                     <!-- Summary -->
                     <div class="row mt-4">
                         <div class="col-md-12">

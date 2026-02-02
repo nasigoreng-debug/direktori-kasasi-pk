@@ -175,9 +175,9 @@
                                                 <div
                                                     class="list-group-item d-flex justify-content-between align-items-center">
                                                     <div>
-                                                        <strong>{{ $pengadilan->kode }}</strong>
+                                                        <strong>{{ $pengadilan->nama }}</strong>
                                                         <br>
-                                                        <small class="text-muted">{{ $pengadilan->nama }}</small>
+                                                        <small class="text-muted">{{ $pengadilan->kode }}</small>
                                                     </div>
                                                     <span
                                                         class="badge bg-primary rounded-pill">{{ $pengadilan->uploads_count }}</span>

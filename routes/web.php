@@ -45,8 +45,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/edit/{id}', [UploadController::class, 'edit'])->name('edit');
             Route::put('/update/{id}', [UploadController::class, 'update'])->name('update');
             Route::delete('/destroy/{id}', [UploadController::class, 'destroy'])->name('destroy');
-            
-            // ✅ TAMBAHKAN ROUTES UNTUK TRASH
+
+            // ✅ ROUTES UNTUK TRASH
             Route::prefix('trash')->name('trash.')->group(function () {
                 Route::get('/', [UploadController::class, 'trashIndex'])->name('index');
                 Route::post('/restore/{id}', [UploadController::class, 'restore'])->name('restore');

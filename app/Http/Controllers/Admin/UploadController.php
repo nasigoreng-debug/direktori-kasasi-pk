@@ -338,7 +338,7 @@ class UploadController extends Controller
         $uploads = $query->paginate(20);
         $users = User::orderBy('name')->get();
 
-        return view('admin.uploads.trash', compact('uploads', 'users'));
+        return view('admin.uploads.trash.index', compact('uploads', 'users'));
     }
 
     /**

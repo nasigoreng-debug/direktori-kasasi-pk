@@ -8,7 +8,7 @@ class Pengadilan extends Model
 {
     // ✅ Tentukan nama tabel secara eksplisit
     protected $table = 'pengadilan';
-    
+
     protected $fillable = [
         'kode',
         'nama',

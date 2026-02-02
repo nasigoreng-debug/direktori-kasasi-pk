@@ -17,8 +17,8 @@
                             <i class="fas fa-arrow-left"></i> Kembali ke History
                         </a>
                         @if($uploads->total() > 0)
-                        <button type="button" class="btn btn-danger btn-sm" 
-                                data-bs-toggle="modal" data-bs-target="#emptyTrashModal">
+                        <button type="button" class="btn btn-danger btn-sm"
+                            data-bs-toggle="modal" data-bs-target="#emptyTrashModal">
                             <i class="fas fa-trash-alt"></i> Kosongkan Trash
                         </button>
                         @endif
@@ -27,19 +27,19 @@
 
                 <div class="card-body">
                     @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show">
-                            <i class="fas fa-check-circle me-2"></i>
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
+                    <div class="alert alert-success alert-dismissible fade show">
+                        <i class="fas fa-check-circle me-2"></i>
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
                     @endif
 
                     @if(session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show">
-                            <i class="fas fa-exclamation-circle me-2"></i>
-                            {{ session('error') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
                     @endif
 
                     @if($uploads->count() > 0)
@@ -84,32 +84,32 @@
                                     <td>{{ $upload->tanggal_putusan->format('d/m/Y') }}</td>
                                     <td>
                                         @if($upload->catatan)
-                                            <span class="text-danger">
-                                                <i class="fas fa-comment me-1"></i>
-                                                {{ $upload->catatan }}
-                                            </span>
+                                        <span class="text-danger">
+                                            <i class="fas fa-comment me-1"></i>
+                                            {{ $upload->catatan }}
+                                        </span>
                                         @else
-                                            <span class="text-muted">
-                                                <i class="fas fa-user me-1"></i>
-                                                Dihapus oleh user
-                                            </span>
+                                        <span class="text-muted">
+                                            <i class="fas fa-user me-1"></i>
+                                            Dihapus oleh user
+                                        </span>
                                         @endif
                                     </td>
                                     <td>
                                         <div class="btn-group btn-group-sm">
                                             <!-- RESTORE BUTTON -->
-                                            <button type="button" class="btn btn-success" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#restoreModal{{ $upload->id }}"
-                                                    title="Pulihkan">
+                                            <button type="button" class="btn btn-success"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#restoreModal{{ $upload->id }}"
+                                                title="Pulihkan">
                                                 <i class="fas fa-undo"></i>
                                             </button>
 
                                             <!-- PERMANENT DELETE BUTTON -->
-                                            <button type="button" class="btn btn-danger" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#forceDeleteModal{{ $upload->id }}"
-                                                    title="Hapus Permanen">
+                                            <button type="button" class="btn btn-danger"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#forceDeleteModal{{ $upload->id }}"
+                                                title="Hapus Permanen">
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>
                                         </div>
@@ -155,9 +155,9 @@
                 <div class="text-center mb-4">
                     <i class="fas fa-undo fa-3x text-success"></i>
                 </div>
-                
+
                 <h6 class="text-center mb-3">Pulihkan putusan ini?</h6>
-                
+
                 <div class="alert alert-info">
                     <strong>Detail Putusan:</strong>
                     <ul class="mb-0 mt-2">
@@ -168,7 +168,7 @@
                         <li><strong>Dihapus pada:</strong> {{ $upload->deleted_at->format('d/m/Y H:i') }}</li>
                     </ul>
                 </div>
-                
+
                 <div class="alert alert-success">
                     <i class="fas fa-info-circle me-2"></i>
                     <strong>Informasi:</strong>
@@ -208,9 +208,9 @@
                 <div class="text-center mb-4">
                     <i class="fas fa-skull-crossbones fa-3x text-danger"></i>
                 </div>
-                
+
                 <h6 class="text-center mb-3">HAPUS PERMANEN PUTUSAN INI?</h6>
-                
+
                 <div class="alert alert-danger">
                     <strong>PERINGATAN TINGGI:</strong>
                     <ul class="mb-0 mt-2">
@@ -220,7 +220,7 @@
                         <li>Aksi ini <strong>TIDAK DAPAT DIBATALKAN</strong></li>
                     </ul>
                 </div>
-                
+
                 <div class="alert alert-info">
                     <strong>Detail Putusan yang akan dihapus:</strong>
                     <ul class="mb-0 mt-2">
@@ -228,14 +228,14 @@
                         <li><strong>Jenis:</strong> {{ strtoupper($upload->jenis_putusan) }}</li>
                         <li><strong>Nomor Perkara:</strong> {{ $upload->nomor_perkara_pa }}</li>
                         <li><strong>File:</strong> {{ basename($upload->file_path) }}</li>
-                        <li><strong>Ukuran File:</strong> 
+                        <li><strong>Ukuran File:</strong>
                             @php
-                                $filePath = storage_path('app/public/' . $upload->file_path);
-                                if(file_exists($filePath)) {
-                                    echo number_format(filesize($filePath) / 1024, 2) . ' KB';
-                                } else {
-                                    echo 'File tidak ditemukan';
-                                }
+                            $filePath = storage_path('app/public/' . $upload->file_path);
+                            if(file_exists($filePath)) {
+                            echo number_format(filesize($filePath) / 1024, 2) . ' KB';
+                            } else {
+                            echo 'File tidak ditemukan';
+                            }
                             @endphp
                         </li>
                     </ul>
@@ -272,9 +272,9 @@
                 <div class="text-center mb-4">
                     <i class="fas fa-radiation fa-3x text-danger"></i>
                 </div>
-                
+
                 <h4 class="text-center text-danger mb-4">PERINGATAN EKSTREM!</h4>
-                
+
                 <div class="alert alert-danger">
                     <strong>ANDA AKAN MENGHAPUS:</strong>
                     <ul class="mb-0 mt-2">
@@ -285,7 +285,7 @@
                         <li><strong>TIDAK BISA DIBATALKAN</strong></li>
                     </ul>
                 </div>
-                
+
                 <div class="alert alert-warning">
                     <i class="fas fa-lightbulb me-2"></i>
                     <strong>Saran:</strong>
@@ -295,7 +295,7 @@
                         <li>Trash akan otomatis terhapus setelah 30 hari</li>
                     </ul>
                 </div>
-             </div>
+            </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> Batal
@@ -315,33 +315,33 @@
 
 @push('styles')
 <style>
-/* Animation for modal */
-.modal.fade .modal-dialog {
-    transform: translateY(-50px);
-    transition: transform 0.3s ease-out;
-}
+    /* Animation for modal */
+    .modal.fade .modal-dialog {
+        transform: translateY(-50px);
+        transition: transform 0.3s ease-out;
+    }
 
-.modal.show .modal-dialog {
-    transform: translateY(0);
-}
+    .modal.show .modal-dialog {
+        transform: translateY(0);
+    }
 
-/* Custom button styles */
-.btn-danger {
-    transition: all 0.3s ease;
-}
+    /* Custom button styles */
+    .btn-danger {
+        transition: all 0.3s ease;
+    }
 
-.btn-danger:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
-}
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+    }
 
-.btn-success {
-    transition: all 0.3s ease;
-}
+    .btn-success {
+        transition: all 0.3s ease;
+    }
 
-.btn-success:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(25, 135, 84, 0.3);
-}
+    .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(25, 135, 84, 0.3);
+    }
 </style>
 @endpush

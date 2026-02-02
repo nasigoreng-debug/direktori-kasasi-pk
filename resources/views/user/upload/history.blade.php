@@ -47,15 +47,15 @@
                     </form>
 
                     @if(session('success'))
-                        <div class="alert alert-success">
-                            {{ session('success') }}
-                        </div>
+                    <div class="alert alert-success">
+                        {{ session('success') }}
+                    </div>
                     @endif
 
                     @if(session('error'))
-                        <div class="alert alert-danger">
-                            {{ session('error') }}
-                        </div>
+                    <div class="alert alert-danger">
+                        {{ session('error') }}
+                    </div>
                     @endif
 
                     @if($uploads->count() > 0)
@@ -82,7 +82,7 @@
                                             <span class="text-muted">{{ $upload->created_at->format('H:i') }}</span>
                                         </small>
                                     </td>
-                                    <td>{{ $upload->pengadilan->kode }}</td>
+                                    <td>{{ $upload->pengadilan->nama }}</td>
                                     <td>
                                         <span class="badge bg-{{ $upload->jenis_putusan == 'kasasi' ? 'info' : 'warning' }}">
                                             {{ strtoupper($upload->jenis_putusan) }}
@@ -93,41 +93,41 @@
                                     </td>
                                     <td>
                                         @php
-                                            $statusColors = [
-                                                'submitted' => 'primary',
-                                                'verified' => 'success',
-                                                'rejected' => 'danger'
-                                            ];
+                                        $statusColors = [
+                                        'submitted' => 'primary',
+                                        'verified' => 'success',
+                                        'rejected' => 'danger'
+                                        ];
                                         @endphp
                                         <span class="badge bg-{{ $statusColors[$upload->status] ?? 'secondary' }}">
                                             {{ ucfirst($upload->status) }}
                                         </span>
                                         @if($upload->catatan)
-                                            <br>
-                                            <small class="text-muted" title="{{ $upload->catatan }}">
-                                                <i class="fas fa-sticky-note"></i> Catatan admin
-                                            </small>
+                                        <br>
+                                        <small class="text-muted" title="{{ $upload->catatan }}">
+                                            <i class="fas fa-sticky-note"></i> Catatan admin
+                                        </small>
                                         @endif
                                     </td>
                                     <td>
                                         <div class="btn-group btn-group-sm">
-                                            <a href="{{ route('user.upload.preview', $upload->id) }}" 
-                                               class="btn btn-info" target="_blank" title="Preview">
+                                            <a href="{{ route('user.upload.preview', $upload->id) }}"
+                                                class="btn btn-info" target="_blank" title="Preview">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="{{ route('user.upload.download', $upload->id) }}" 
-                                               class="btn btn-success" title="Download">
+                                            <a href="{{ route('user.upload.download', $upload->id) }}"
+                                                class="btn btn-success" title="Download">
                                                 <i class="fas fa-download"></i>
                                             </a>
                                             @if($upload->status !== 'verified')
-                                            <a href="{{ route('user.upload.edit', $upload->id) }}" 
-                                               class="btn btn-warning" title="Edit">
+                                            <a href="{{ route('user.upload.edit', $upload->id) }}"
+                                                class="btn btn-warning" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <button type="button" class="btn btn-danger" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#deleteModal{{ $upload->id }}"
-                                                    title="Hapus">
+                                            <button type="button" class="btn btn-danger"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteModal{{ $upload->id }}"
+                                                title="Hapus">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                             @endif
@@ -175,9 +175,9 @@
                 <div class="text-center mb-4">
                     <i class="fas fa-exclamation-triangle fa-3x text-warning"></i>
                 </div>
-                
+
                 <h6 class="text-center mb-3">Anda yakin ingin menghapus putusan ini?</h6>
-                
+
                 <div class="alert alert-info">
                     <strong>Detail Putusan:</strong>
                     <ul class="mb-0 mt-2">
@@ -185,14 +185,14 @@
                         <li><strong>Jenis:</strong> {{ strtoupper($upload->jenis_putusan) }}</li>
                         <li><strong>Nomor Perkara:</strong> {{ $upload->nomor_perkara_pa }}</li>
                         <li><strong>Tanggal Putusan:</strong> {{ $upload->tanggal_putusan->format('d/m/Y') }}</li>
-                        <li><strong>Status:</strong> 
+                        <li><strong>Status:</strong>
                             <span class="badge bg-{{ $statusColors[$upload->status] ?? 'secondary' }}">
                                 {{ ucfirst($upload->status) }}
                             </span>
                         </li>
                     </ul>
                 </div>
-                
+
                 <div class="alert alert-warning">
                     <i class="fas fa-info-circle me-2"></i>
                     <strong>Informasi:</strong>
