@@ -10,31 +10,36 @@
                 <h5 class="mb-0">Dashboard Pengguna</h5>
             </div>
             <div class="card-body">
+                {{-- Bagian Informasi Pengadilan dan Akun --}}
                 <div class="row">
-                    <div class="card bg-primary text-white mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <i class="fas fa-landmark"></i> Informasi Pengadilan
-                            </h5>
-                            <hr>
-                            @isset($pengadilan)
-                            <p class="mb-1"><strong>Nama:</strong> {{ $pengadilan->nama ?? 'Tidak tersedia' }}</p>
-                            <p class="mb-1"><strong>Kode:</strong> {{ $pengadilan->kode ?? 'Tidak tersedia' }}</p>
-                            <p class="mb-1"><strong>Wilayah:</strong> {{ $pengadilan->wilayah ?? 'Tidak tersedia' }}</p>
-                            @if(!empty($pengadilan->kelas))
-                            <p class="mb-0"><strong>Kelas:</strong> {{ $pengadilan->kelas }}</p>
-                            @endif
-                            @else
-                            <div class="alert alert-warning mb-0">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                Data pengadilan tidak ditemukan
+                    {{-- Informasi Pengadilan --}}
+                    <div class="col-md-6 mb-3">
+                        <div class="card bg-primary text-white h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="fas fa-landmark"></i> Informasi Pengadilan
+                                </h5>
+                                <hr>
+                                @isset($pengadilan)
+                                <p class="mb-1"><strong>Nama:</strong> {{ $pengadilan->nama ?? 'Tidak tersedia' }}</p>
+                                <p class="mb-1"><strong>Kode:</strong> {{ $pengadilan->kode ?? 'Tidak tersedia' }}</p>
+                                <p class="mb-1"><strong>Wilayah:</strong> {{ $pengadilan->wilayah ?? 'Tidak tersedia' }}</p>
+                                @if(!empty($pengadilan->kelas))
+                                <p class="mb-0"><strong>Kelas:</strong> {{ $pengadilan->kelas }}</p>
+                                @endif
+                                @else
+                                <div class="alert alert-warning mb-0">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    Data pengadilan tidak ditemukan
+                                </div>
+                                @endisset
                             </div>
-                            @endisset
                         </div>
                     </div>
 
-                    <div class="col-md-6">
-                        <div class="card bg-success text-white mb-3">
+                    {{-- Informasi Akun --}}
+                    <div class="col-md-6 mb-3">
+                        <div class="card bg-success text-white h-100">
                             <div class="card-body">
                                 <h5 class="card-title">
                                     <i class="fas fa-user"></i> Informasi Akun
@@ -48,10 +53,11 @@
                         </div>
                     </div>
                 </div>
-                {{-- Tambahkan setelah Informasi Akun --}}
+
+                {{-- Statistik --}}
                 <div class="row mt-4">
                     <div class="col-md-4 mb-3">
-                        <div class="card text-white bg-info">
+                        <div class="card text-white bg-info h-100">
                             <div class="card-body text-center">
                                 <h1><i class="fas fa-file-upload"></i></h1>
                                 <h5>Total Upload</h5>
@@ -61,7 +67,7 @@
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <div class="card text-white bg-primary">
+                        <div class="card text-white bg-primary h-100">
                             <div class="card-body text-center">
                                 <h1><i class="fas fa-gavel"></i></h1>
                                 <h5>Putusan Kasasi</h5>
@@ -71,7 +77,7 @@
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <div class="card text-white bg-warning">
+                        <div class="card text-white bg-warning h-100">
                             <div class="card-body text-center">
                                 <h1><i class="fas fa-balance-scale"></i></h1>
                                 <h5>Putusan PK</h5>
@@ -127,13 +133,15 @@
                     </div>
                 </div>
                 @endif
+
+                {{-- Tombol Aksi --}}
                 <div class="row mt-4">
                     <div class="col-md-12">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-start">
-                            <a href="{{ route('user.upload.create') }}" class="btn btn-primary me-2">
+                            <a href="{{ route('user.uploads.create') }}" class="btn btn-primary me-2">
                                 <i class="fas fa-upload"></i> Upload Putusan Baru
                             </a>
-                            <a href="{{ route('user.upload.history') }}" class="btn btn-secondary">
+                            <a href="{{ route('user.uploads.history') }}" class="btn btn-secondary">
                                 <i class="fas fa-history"></i> Lihat History Upload
                             </a>
                         </div>

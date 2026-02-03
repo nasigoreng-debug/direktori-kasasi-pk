@@ -290,8 +290,13 @@
                                     </td>
                                     <td>
                                         <div class="btn-group btn-group-sm">
+                                            <!-- TOMBOL SHOW -->
+                                            <a href="{{ route('admin.uploads.show', $upload->id) }}"
+                                                class="btn btn-primary" title="Detail">
+                                                <i class="fas fa-info-circle"></i>
+                                            </a>
                                             <a href="{{ route('admin.uploads.preview', $upload->id) }}"
-                                                class="btn btn-info" target="_blank" title="Preview">
+                                                class="btn btn-info" target="_blank" title="Preview File">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                             <a href="{{ route('admin.uploads.download', $upload->id) }}"

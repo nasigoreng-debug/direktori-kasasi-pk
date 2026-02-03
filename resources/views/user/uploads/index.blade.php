@@ -11,7 +11,7 @@
                     <h5 class="mb-0">
                         <i class="fas fa-history"></i> History Upload Putusan
                     </h5>
-                    <a href="{{ route('user.upload.create') }}" class="btn btn-primary btn-sm">
+                    <a href="{{ route('user.uploads.create') }}" class="btn btn-primary btn-sm">
                         <i class="fas fa-plus"></i> Upload Baru
                     </a>
                 </div>
@@ -39,7 +39,7 @@
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-search"></i> Filter
                                 </button>
-                                <a href="{{ route('user.upload.history') }}" class="btn btn-secondary">
+                                <a href="{{ route('user.uploads.history') }}" class="btn btn-secondary">
                                     <i class="fas fa-times"></i>
                                 </a>
                             </div>
@@ -111,16 +111,21 @@
                                     </td>
                                     <td>
                                         <div class="btn-group btn-group-sm">
-                                            <a href="{{ route('user.upload.preview', $upload->id) }}"
+                                            <!-- TOMBOL SHOW -->
+                                            <a href="{{ route('user.uploads.show', $upload->id) }}"
+                                                class="btn btn-primary" title="Detail">
+                                                <i class="fas fa-info-circle"></i>
+                                            </a>
+                                            <a href="{{ route('user.uploads.preview', $upload->id) }}"
                                                 class="btn btn-info" target="_blank" title="Preview">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="{{ route('user.upload.download', $upload->id) }}"
+                                            <a href="{{ route('user.uploads.download', $upload->id) }}"
                                                 class="btn btn-success" title="Download">
                                                 <i class="fas fa-download"></i>
                                             </a>
                                             @if($upload->status !== 'verified')
-                                            <a href="{{ route('user.upload.edit', $upload->id) }}"
+                                            <a href="{{ route('user.uploads.edit', $upload->id) }}"
                                                 class="btn btn-warning" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </a>
@@ -148,7 +153,7 @@
                         <i class="fas fa-file-upload fa-3x text-muted mb-3"></i>
                         <h5>Belum ada history upload</h5>
                         <p class="text-muted">Silakan upload putusan pertama Anda</p>
-                        <a href="{{ route('user.upload.create') }}" class="btn btn-primary">
+                        <a href="{{ route('user.uploads.create') }}" class="btn btn-primary">
                             <i class="fas fa-upload"></i> Upload Putusan
                         </a>
                     </div>
@@ -207,7 +212,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> Batal
                 </button>
-                <form action="{{ route('user.upload.destroy', $upload->id) }}" method="POST" class="d-inline">
+                <form action="{{ route('user.uploads.destroy', $upload->id) }}" method="POST" class="d-inline">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-danger">

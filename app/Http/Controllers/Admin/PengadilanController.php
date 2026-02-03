@@ -173,19 +173,29 @@ class PengadilanController extends Controller
      * @param  int  $id
      * @return \Illuminate\View\View
      */
+    /**
+     * Menampilkan detail pengadilan
+     */
     public function show($id)
     {
-        // Mengambil data pengadilan dengan relasi users dan uploads (eager loading)
-        $pengadilan = Pengadilan::with(['users', 'uploads'])->findOrFail($id);
+        $pengadilan = Pengadilan::with(['users', 'uploads.user'])
+            ->findOrFail($id);
 
-        // Menghitung statistik untuk pengadilan ini
-        $stats = [
-            'total_users' => $pengadilan->users()->count(),
-            'total_uploads' => $pengadilan->uploads()->count(),
-            'uploads_kasasi' => $pengadilan->uploads()->where('jenis_putusan', 'kasasi')->count(),
-            'uploads_pk' => $pengadilan->uploads()->where('jenis_putusan', 'pk')->count(),
+        // Hitung statistik
+        $statistics = [
+            'total_users' => $pengadilan->users->count(),
+            'total_uploads' => $pengadilan->uploads->count(),
+            'uploads_kasasi' => $pengadilan->uploads->where('jenis_putusan', 'kasasi')->count(),
+            'uploads_pk' => $pengadilan->uploads->where('jenis_putusan', 'pk')->count(),
         ];
 
-        return view('admin.pengadilan.show', compact('pengadilan', 'stats'));
+        return view('admin.pengadilan.show', [
+            'pengadilan' => $pengadilan,
+            'total_users' => $statistics['total_users'],
+            'total_uploads' => $statistics['total_uploads'],
+            'uploads_kasasi' => $statistics['uploads_kasasi'],
+            'uploads_pk' => $statistics['uploads_pk'],
+            'title' => 'Detail Pengadilan: ' . $pengadilan->nama
+        ]);
     }
 }

@@ -27,7 +27,7 @@
                     @endif
 
                     {{-- ✅ FORM YANG BENAR --}}
-                    <form id="uploadForm" action="{{ route('user.upload.store') }}" method="POST" enctype="multipart/form-data">
+                    <form id="uploadForm" action="{{ route('user.uploads.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
                         <div class="row mb-3">
@@ -142,7 +142,7 @@
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <a href="{{ route('user.upload.history') }}" class="btn btn-secondary">
+                            <a href="{{ route('user.uploads.history') }}" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> Kembali
                             </a>
                             <button type="submit" class="btn btn-primary" id="submitBtn">

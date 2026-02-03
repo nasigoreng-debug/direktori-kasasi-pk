@@ -12,7 +12,7 @@
                         <i class="fas fa-edit"></i> Edit Putusan
                         <small class="text-muted">#{{ $upload->id }}</small>
                     </h5>
-                    <a href="{{ route('user.upload.history') }}" class="btn btn-sm btn-secondary">
+                    <a href="{{ route('user.uploads.history') }}" class="btn btn-sm btn-secondary">
                         <i class="fas fa-arrow-left"></i> Kembali
                     </a>
                 </div>
@@ -42,7 +42,7 @@
                     @endif
 
                     {{-- Form --}}
-                    <form action="{{ route('user.upload.update', $upload->id) }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('user.uploads.update', $upload->id) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -140,7 +140,7 @@
                                     <div class="alert alert-info">
                                         <i class="fas fa-file-pdf text-danger"></i>
                                         File saat ini:
-                                        <a href="{{ route('user.upload.preview', $upload->id) }}" target="_blank" class="text-decoration-none">
+                                        <a href="{{ route('user.uploads.preview', $upload->id) }}" target="_blank" class="text-decoration-none">
                                             {{ $upload->original_filename }}
                                         </a>
                                         ({{ number_format($upload->file_size / 1024, 1) }} KB)
@@ -174,7 +174,7 @@
                                 <button type="submit" class="btn btn-primary" {{ $upload->status === 'verified' ? 'disabled' : '' }}>
                                     <i class="fas fa-save"></i> Simpan Perubahan
                                 </button>
-                                <a href="{{ route('user.upload.history') }}" class="btn btn-secondary">
+                                <a href="{{ route('user.uploads.history') }}" class="btn btn-secondary">
                                     Batal
                                 </a>
                             </div>
@@ -240,7 +240,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> Batal
                 </button>
-                <form action="{{ route('user.upload.destroy', $upload->id) }}" method="POST" class="d-inline">
+                <form action="{{ route('user.uploads.destroy', $upload->id) }}" method="POST" class="d-inline">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-danger">

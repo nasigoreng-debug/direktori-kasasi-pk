@@ -1,236 +1,213 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-bs-theme="light">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>@yield('title', 'Aplikasi Putusan Kasasi/PK')</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    
+    <title>@yield('title', 'Sistem Putusan Kasasi/PK')</title>
+    <meta name="description" content="@yield('description', 'Aplikasi manajemen putusan kasasi dan peninjauan kembali')">
 
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+
+    <!-- CSS Libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --success-color: #198754;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+        }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        main {
+            flex: 1;
+        }
+        
+        .navbar-brand {
+            font-weight: 600;
+        }
+        
+        .nav-link.active {
+            font-weight: 500;
+            position: relative;
+        }
+        
+        .nav-link.active:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 10%;
+            width: 80%;
+            height: 2px;
+            background-color: white;
+        }
+        
+        .dropdown-item:active {
+            background-color: var(--primary-color);
+        }
+        
+        footer {
+            border-top: 1px solid #dee2e6;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            
+            .nav-link.active:after {
+                display: none;
+            }
+        }
+    </style>
 
     @stack('styles')
 </head>
 
 <body>
+    <!-- Navigation -->
     @auth
-    @if(auth()->user()->role === 'admin' && request()->is('admin*'))
-    <!-- NAVBAR ADMIN -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
-        <div class="container">
-            <a class="navbar-brand" href="{{ route('admin.dashboard') }}">
-                <i class="fas fa-user-shield"></i> ADMIN PANEL
-            </a>
-            <div class="collapse navbar-collapse" id="navbarAdmin">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
-                            href="{{ route('admin.dashboard') }}">
-                            <i class="fas fa-tachometer-alt"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('admin.uploads.*') ? 'active' : '' }}"
-                            href="{{ route('admin.uploads.index') }}">
-                            <i class="fas fa-upload"></i> Semua Upload
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}"
-                            href="{{ route('admin.users.index') }}">
-                            <i class="fas fa-users"></i> User
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('admin.pengadilan.*') ? 'active' : '' }}"
-                            href="{{ route('admin.pengadilan.index') }}">
-                            <i class="fas fa-landmark"></i> Pengadilan
-                        </a>
-                    </li>
-                </ul>
-
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user-shield"></i> {{ Auth::user()->name }}
-                            <span class="badge bg-warning">ADMIN</span>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <!-- <li>
-                                <a class="dropdown-item" href="{{ route('user.dashboard') }}">
-                                    <i class="fas fa-exchange-alt"></i> Switch to User
-                                </a>
-                            </li>
-                            <li> -->
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item">
-                                        <i class="fas fa-sign-out-alt"></i> Logout
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+        @if(auth()->user()->role === 'admin' && request()->is('admin*'))
+            @include('layouts.partials.navbar-admin')
+        @else
+            @include('layouts.partials.navbar-user')
+        @endif
     @else
-    <!-- NAVBAR USER (DENGAN MENU TRASH) -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url('/') }}">
-                <i class="fas fa-balance-scale"></i> Putusan Kasasi/PK
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarUser">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarUser">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('user.dashboard') ? 'active' : '' }}"
-                            href="{{ route('user.dashboard') }}">
-                            <i class="fas fa-tachometer-alt"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('user.upload.create') ? 'active' : '' }}"
-                            href="{{ route('user.upload.create') }}">
-                            <i class="fas fa-upload"></i> Upload
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('user.upload.history') ? 'active' : '' }}"
-                            href="{{ route('user.upload.history') }}">
-                            <i class="fas fa-history"></i> History
-                        </a>
-                    </li>
-
-                    <!-- ✅ MENU TRASH (AKTIF) -->
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('user.upload.trash.*') ? 'active' : '' }}"
-                            href="{{ route('user.upload.trash.index') }}">
-                            <i class="fas fa-trash"></i> Trash
-                            @php
-                            // Hitung jumlah item di trash untuk user ini
-                            $trashCount = auth()->check() ?
-                            \App\Models\Upload::onlyTrashed()
-                            ->where('user_id', auth()->id())
-                            ->count() : 0;
-                            @endphp
-                            @if($trashCount > 0)
-                            <span class="badge bg-danger">{{ $trashCount }}</span>
-                            @endif
-                        </a>
-                    </li>
-
-                    <!-- Menu Admin Panel (jika user adalah admin) -->
-                    @if(auth()->user()->role === 'admin')
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('admin.*') ? 'active' : '' }}"
-                            href="{{ route('admin.dashboard') }}">
-                            <i class="fas fa-user-shield"></i> Admin Panel
-                        </a>
-                    </li>
-                    @endif
-                </ul>
-
-                <!-- Right Side Of Navbar -->
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user"></i> {{ Auth::user()->name }}
-                            @if(Auth::user()->role === 'admin')
-                            <span class="badge bg-warning">ADMIN</span>
-                            @endif
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a class="dropdown-item" href="{{ route('user.profile.edit') }}">
-                                    <i class="fas fa-user-circle"></i> Profile & Password
-                                </a>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item">
-                                        <i class="fas fa-sign-out-alt"></i> Logout
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-    @endif
-    @else
-    <!-- NAVBAR GUEST -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url('/') }}">
-                <i class="fas fa-balance-scale"></i> Putusan Kasasi/PK
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarGuest">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarGuest">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('login') }}">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('register') }}">Register</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+        @include('layouts.partials.navbar-guest')
     @endauth
 
+    <!-- Main Content -->
     <main class="py-4">
         <div class="container">
-            @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <!-- Flash Messages -->
+            <div class="flash-messages">
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
+                @if(session('warning'))
+                    <div class="alert alert-warning alert-dismissible fade show shadow-sm" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        {{ session('warning') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
+                @if(session('info'))
+                    <div class="alert alert-info alert-dismissible fade show shadow-sm" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        {{ session('info') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
             </div>
+
+            <!-- Page Title (Optional) -->
+            @hasSection('page-title')
+                <div class="row mb-4">
+                    <div class="col">
+                        <h1 class="h3 mb-0">
+                            @yield('page-title')
+                            @hasSection('page-subtitle')
+                                <small class="text-muted d-block mt-1">
+                                    @yield('page-subtitle')
+                                </small>
+                            @endif
+                        </h1>
+                    </div>
+                    @hasSection('page-actions')
+                        <div class="col-auto">
+                            @yield('page-actions')
+                        </div>
+                    @endif
+                </div>
             @endif
 
-            @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show">
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            @endif
-
+            <!-- Content -->
             @yield('content')
         </div>
     </main>
 
-    <footer class="bg-light text-center py-3 mt-5">
+    <!-- Footer -->
+    <footer class="bg-light py-4 mt-auto">
         <div class="container">
-            <p class="mb-0">© {{ date('Y') }} Aplikasi Putusan Kasasi/PK - Pengadilan Agama Jawa Barat</p>
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="mb-0 text-muted">
+                        <i class="fas fa-balance-scale text-primary me-1"></i>
+                        <strong>Sistem Putusan Kasasi/PK</strong> &copy; {{ date('Y') }}
+                    </p>
+                    <small class="text-muted">Pengadilan Agama Jawa Barat</small>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <small class="text-muted">
+                        <i class="fas fa-code me-1"></i>Versi 1.0.0
+                        @auth
+                            | <i class="fas fa-user me-1 ms-2"></i>{{ Auth::user()->name }}
+                        @endauth
+                    </small>
+                </div>
+            </div>
         </div>
     </footer>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- SweetAlert2 (Optional) -->
+    <!-- JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Custom Scripts -->
+    <script>
+        // Auto-dismiss alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 5000);
+            });
+            
+            // Set active menu based on current URL
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+            
+            // CSRF token for AJAX requests
+            window.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        });
+    </script>
 
     @stack('scripts')
 </body>
-
 </html>

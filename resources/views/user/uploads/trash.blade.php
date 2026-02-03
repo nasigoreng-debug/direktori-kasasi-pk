@@ -13,7 +13,7 @@
                         <span class="badge bg-danger">{{ $uploads->total() }}</span>
                     </h5>
                     <div>
-                        <a href="{{ route('user.upload.history') }}" class="btn btn-secondary btn-sm">
+                        <a href="{{ route('user.uploads.index') }}" class="btn btn-secondary btn-sm">
                             <i class="fas fa-arrow-left"></i> Kembali ke History
                         </a>
                         @if($uploads->total() > 0)
@@ -129,7 +129,7 @@
                         <i class="fas fa-trash fa-3x text-muted mb-3"></i>
                         <h5>Trash kosong</h5>
                         <p class="text-muted">Tidak ada putusan yang terhapus</p>
-                        <a href="{{ route('user.upload.history') }}" class="btn btn-primary">
+                        <a href="{{ route('user.uploads.index') }}" class="btn btn-primary">
                             <i class="fas fa-history"></i> Lihat History
                         </a>
                     </div>
@@ -183,7 +183,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> Batal
                 </button>
-                <form action="{{ route('user.upload.trash.restore', $upload->id) }}" method="POST" class="d-inline">
+                <form action="{{ route('user.uploads.trash.restore', $upload->id) }}" method="POST" class="d-inline">
                     @csrf
                     <button type="submit" class="btn btn-success">
                         <i class="fas fa-undo"></i> Ya, Pulihkan
@@ -245,7 +245,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> Batal
                 </button>
-                <form action="{{ route('user.upload.trash.force-delete', $upload->id) }}" method="POST" class="d-inline">
+                <form action="{{ route('user.uploads.trash.force-delete', $upload->id) }}" method="POST" class="d-inline">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-danger">
@@ -300,7 +300,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> Batal
                 </button>
-                <form action="{{ route('user.upload.trash.empty') }}" method="POST" class="d-inline">
+                <form action="{{ route('user.uploads.trash.empty') }}" method="POST" class="d-inline">
                     @csrf
                     <button type="submit" class="btn btn-danger">
                         <i class="fas fa-bomb"></i> Ya, Kosongkan Semua
